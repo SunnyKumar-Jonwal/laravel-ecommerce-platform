@@ -199,4 +199,4 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 ## Support
 
-For support, email support@yourstore.com or create an issue in the repository.
+For support, email sunnyjonwal76@gmail.com or create an issue in the repository.
