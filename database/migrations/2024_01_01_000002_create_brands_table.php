@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('image')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('website')->nullable();
             $table->boolean('status')->default(true);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
