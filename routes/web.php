@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
@@ -83,6 +84,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Categories
     Route::resource('categories', CategoryController::class);
+    
+    // Brands
+    Route::resource('brands', BrandController::class);
     
     // Products
     Route::resource('products', ProductController::class);

@@ -27,6 +27,7 @@ class Product extends Model
         'dimensions',
         'status',
         'featured',
+        'featured_image',
         'meta_title',
         'meta_description',
         'meta_keywords',

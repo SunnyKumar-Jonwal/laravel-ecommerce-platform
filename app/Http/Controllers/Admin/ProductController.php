@@ -35,11 +35,13 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
+            'sku' => 'nullable|string|unique:products,sku',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0|lt:price',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'stock_quantity' => 'required|integer|min:0',
+            'stock_status' => 'required|in:in_stock,out_of_stock,on_backorder',
             'weight' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:active,inactive',
             'featured' => 'nullable|boolean',
@@ -50,10 +52,10 @@ class ProductController extends Controller
         $data = $request->all();
         $data['slug'] = Str::slug($request->name);
         $data['status'] = $request->status === 'active' ? true : false;
-        $data['featured'] = $request->has('is_featured');
+        $data['featured'] = $request->has('featured');
         
-        // Generate SKU automatically
-        $data['sku'] = $this->generateSKU($request->name);
+        // Generate SKU automatically if not provided
+        $data['sku'] = $request->sku ?: $this->generateSKU($request->name);
         
         // Handle featured image upload
         if ($request->hasFile('featured_image')) {
@@ -103,6 +105,7 @@ class ProductController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:active,inactive',
             'featured' => 'nullable|boolean',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
@@ -112,7 +115,20 @@ class ProductController extends Controller
         $data = $request->all();
         $data['slug'] = Str::slug($request->name);
         $data['status'] = $request->status === 'active' ? true : false;
-        $data['featured'] = $request->has('is_featured');
+        $data['featured'] = $request->has('featured');
+        
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            // Delete old featured image if exists
+            if ($product->featured_image && !str_contains($product->featured_image, 'placeholder')) {
+                $oldImagePath = str_replace('storage/', '', $product->featured_image);
+                $fullPath = storage_path('app/public/' . $oldImagePath);
+                if (file_exists($fullPath)) {
+                    unlink($fullPath);
+                }
+            }
+            $data['featured_image'] = $this->uploadImage($request->file('featured_image'));
+        }
         
         if ($request->has('tags')) {
             $data['tags'] = array_map('trim', explode(',', $request->tags));

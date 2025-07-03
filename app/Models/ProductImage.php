@@ -12,6 +12,7 @@ class ProductImage extends Model
     protected $fillable = [
         'product_id',
         'image',
+        'image_path',
         'alt_text',
         'sort_order'
     ];
@@ -29,6 +30,18 @@ class ProductImage extends Model
     // Accessors
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/products/' . $this->image) : asset('images/no-image.png');
+        $imagePath = $this->image_path ?: $this->image;
+        
+        if (!$imagePath) {
+            return asset('images/no-image.png');
+        }
+        
+        // If it already starts with storage/, just add asset()
+        if (str_starts_with($imagePath, 'storage/')) {
+            return asset($imagePath);
+        }
+        
+        // Otherwise, assume it's in products folder
+        return asset('storage/products/' . $imagePath);
     }
 }

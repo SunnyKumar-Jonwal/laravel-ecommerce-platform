@@ -14,6 +14,8 @@ class Brand extends Model
         'slug',
         'description',
         'image',
+        'logo',
+        'website',
         'status',
         'meta_title',
         'meta_description'
@@ -38,10 +40,22 @@ class Brand extends Model
     // Accessors
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/brands/' . $this->image) : asset('images/no-image.png');
+        $imagePath = $this->logo ?: $this->image;
+        
+        if (!$imagePath) {
+            return asset('images/no-image.png');
+        }
+        
+        // If it already starts with storage/, just add asset()
+        if (str_starts_with($imagePath, 'storage/')) {
+            return asset($imagePath);
+        }
+        
+        // Otherwise, assume it's in brands folder
+        return asset('storage/brands/' . $imagePath);
     }
 
-    public function getLogoAttribute()
+    public function getLogoUrlAttribute()
     {
         return $this->getImageUrlAttribute();
     }

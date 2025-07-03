@@ -133,6 +133,13 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}" href="{{ route('admin.brands.index') }}">
+                    <i class="fas fa-fw fa-trademark me-2"></i>
+                    Brands
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
                     <i class="fas fa-fw fa-box me-2"></i>
                     Products
