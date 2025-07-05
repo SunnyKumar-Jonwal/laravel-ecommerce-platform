@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('brands', function (Blueprint $table) {
-            $table->string('logo')->nullable()->after('image');
-            $table->string('website')->nullable()->after('logo');
+            // Check if columns exist before adding them
+            if (!Schema::hasColumn('brands', 'logo')) {
+                $table->string('logo')->nullable()->after('image');
+            }
+            if (!Schema::hasColumn('brands', 'website')) {
+                $table->string('website')->nullable()->after('logo');
+            }
         });
     }
 

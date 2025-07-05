@@ -39,7 +39,20 @@ class BrandController extends Controller
             $data['logo'] = $this->uploadLogo($request->file('logo'));
         }
 
-        Brand::create($data);
+        $brand = Brand::create($data);
+
+        // Check if request is AJAX (for modal submission)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Brand created successfully.',
+                'brand' => [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug
+                ]
+            ]);
+        }
 
         return redirect()->route('admin.brands.index')
             ->with('success', 'Brand created successfully.');

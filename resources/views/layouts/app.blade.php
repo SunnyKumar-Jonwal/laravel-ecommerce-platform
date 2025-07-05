@@ -17,6 +17,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     <!-- Custom CSS -->
     <style>
         :root {
@@ -280,11 +283,59 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Global JavaScript -->
     <script>
         // Update cart count on page load
         $(document).ready(function() {
             updateCartCount();
+
+            // Display Laravel session messages with SweetAlert2
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    timer: 5000,
+                    showConfirmButton: true
+                });
+            @endif
+
+            @if(session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning!',
+                    text: '{{ session('warning') }}',
+                    timer: 4000,
+                    showConfirmButton: true
+                });
+            @endif
+
+            @if(session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Information',
+                    text: '{{ session('info') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
         });
 
         function updateCartCount() {
@@ -316,23 +367,73 @@
             });
         }
 
-        // Show toast notification
+        // Show notification using SweetAlert2
         function showToast(type, message) {
-            const toast = `
-                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body">${message}</div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                </div>
-            `;
-            
-            if (!$('#toast-container').length) {
-                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1051;"></div>');
-            }
-            
-            $('#toast-container').append(toast);
-            $('.toast').last().toast('show');
+            Swal.fire({
+                icon: type === 'success' ? 'success' : 'error',
+                title: type === 'success' ? 'Success!' : 'Error!',
+                text: message,
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        // Global SweetAlert functions for frontend
+        function showSuccessAlert(title, text = '', timer = 3000) {
+            Swal.fire({
+                icon: 'success',
+                title: title,
+                text: text,
+                timer: timer,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        function showErrorAlert(title, text = '') {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: text,
+                showConfirmButton: true
+            });
+        }
+
+        function showWarningAlert(title, text = '') {
+            Swal.fire({
+                icon: 'warning',
+                title: title,
+                text: text,
+                showConfirmButton: true
+            });
+        }
+
+        function showInfoAlert(title, text = '') {
+            Swal.fire({
+                icon: 'info',
+                title: title,
+                text: text,
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        function confirmAction(message = 'Are you sure you want to continue?', confirmButtonText = 'Yes, continue!') {
+            return Swal.fire({
+                title: 'Are you sure?',
+                text: message,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: 'Cancel'
+            });
         }
     </script>
 

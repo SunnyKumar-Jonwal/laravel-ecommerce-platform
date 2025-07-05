@@ -33,14 +33,28 @@ class CategoryController extends Controller
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->name);
-        $data['status'] = $request->status ?? 'active';
+        $data['status'] = $request->status === 'active' ? true : false;
+        $data['sort_order'] = Category::max('sort_order') + 1;
 
         // Handle image upload
         if ($request->hasFile('image')) {
             $data['image'] = $this->uploadImage($request->file('image'));
         }
 
-        Category::create($data);
+        $category = Category::create($data);
+
+        // Check if request is AJAX (for modal submission)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Category created successfully.',
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug
+                ]
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category created successfully.');
