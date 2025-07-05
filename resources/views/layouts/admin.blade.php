@@ -20,6 +20,9 @@
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     <!-- Custom CSS -->
     <style>
         body {
@@ -249,6 +252,9 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Global JavaScript -->
     <script>
         $(document).ready(function() {
@@ -263,7 +269,108 @@
                 "responsive": true,
                 "order": [[ 0, "desc" ]]
             });
+
+            // Display Laravel session messages with SweetAlert2
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    timer: 5000,
+                    showConfirmButton: true
+                });
+            @endif
+
+            @if(session('warning'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning!',
+                    text: '{{ session('warning') }}',
+                    timer: 4000,
+                    showConfirmButton: true
+                });
+            @endif
+
+            @if(session('info'))
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Information',
+                    text: '{{ session('info') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
         });
+
+        // Global SweetAlert functions
+        function showSuccessAlert(title, text = '', timer = 3000) {
+            Swal.fire({
+                icon: 'success',
+                title: title,
+                text: text,
+                timer: timer,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        function showErrorAlert(title, text = '') {
+            Swal.fire({
+                icon: 'error',
+                title: title,
+                text: text,
+                showConfirmButton: true
+            });
+        }
+
+        function showWarningAlert(title, text = '') {
+            Swal.fire({
+                icon: 'warning',
+                title: title,
+                text: text,
+                showConfirmButton: true
+            });
+        }
+
+        function showInfoAlert(title, text = '') {
+            Swal.fire({
+                icon: 'info',
+                title: title,
+                text: text,
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        function confirmDelete(message = 'You won\'t be able to revert this!', confirmButtonText = 'Yes, delete it!') {
+            return Swal.fire({
+                title: 'Are you sure?',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: confirmButtonText,
+                cancelButtonText: 'Cancel'
+            });
+        }
     </script>
 
     @stack('scripts')
