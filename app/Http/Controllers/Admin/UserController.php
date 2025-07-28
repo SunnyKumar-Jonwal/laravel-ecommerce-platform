@@ -67,7 +67,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['roles', 'orders.orderItems.product', 'addresses']);
+        $user->load(['roles', 'orders.items.product', 'addresses']);
         
         $stats = [
             'total_orders' => $user->orders->count(),
@@ -151,7 +151,7 @@ class UserController extends Controller
     public function orders(User $user)
     {
         $orders = $user->orders()
-            ->with(['orderItems.product'])
+            ->with(['items.product'])
             ->latest()
             ->paginate(15);
 

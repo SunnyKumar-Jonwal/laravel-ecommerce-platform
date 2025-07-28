@@ -38,18 +38,18 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-8">
-                                            <h6>Items ({{ $order->orderItems->count() }})</h6>
+                                            <h6>Items ({{ $order->items->count() }})</h6>
                                             <div class="row">
-                                                @foreach($order->orderItems->take(3) as $item)
+                                                @foreach($order->items->take(3) as $item)
                                                     <div class="col-auto">
                                                         <img src="{{ $item->product->featured_image ?? 'https://via.placeholder.com/60x60' }}" 
                                                              alt="{{ $item->product->name }}" 
                                                              class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                                                     </div>
                                                 @endforeach
-                                                @if($order->orderItems->count() > 3)
+                                                @if($order->items->count() > 3)
                                                     <div class="col-auto d-flex align-items-center">
-                                                        <span class="text-muted">+{{ $order->orderItems->count() - 3 }} more</span>
+                                                        <span class="text-muted">+{{ $order->items->count() - 3 }} more</span>
                                                     </div>
                                                 @endif
                                             </div>

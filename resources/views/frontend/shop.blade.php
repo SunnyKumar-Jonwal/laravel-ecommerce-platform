@@ -150,6 +150,18 @@
                                         <button class="btn btn-cart flex-fill" onclick="addToCart({{ $product->id }})">
                                             <i class="fas fa-cart-plus"></i> Add to Cart
                                         </button>
+                                        @auth
+                                        <button class="btn btn-outline-danger wishlist-btn" 
+                                                id="wishlist-btn-{{ $product->id }}"
+                                                data-product-id="{{ $product->id }}"
+                                                onclick="toggleWishlist({{ $product->id }})">
+                                            <i class="far fa-heart" id="wishlist-icon-{{ $product->id }}"></i>
+                                        </button>
+                                        @else
+                                        <a href="{{ route('login') }}" class="btn btn-outline-danger" title="Login to save to wishlist">
+                                            <i class="far fa-heart"></i>
+                                        </a>
+                                        @endauth
                                         <a href="{{ route('product.detail', $product->slug) }}" class="btn btn-outline-primary">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -185,5 +197,157 @@ $('select[name="sort"]').change(function() {
     $('#filter-form').append('<input type="hidden" name="sort" value="' + $(this).val() + '">');
     $('#filter-form').submit();
 });
+
+// Add to cart functionality
+function addToCart(productId) {
+    fetch('{{ route("cart.add") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessAlert('Product added to cart successfully!');
+            updateCartCount();
+        } else {
+            showErrorAlert(data.message || 'Failed to add product to cart');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorAlert('Error adding product to cart');
+    });
+}
+
+@auth
+// Wishlist functionality
+function toggleWishlist(productId) {
+    const button = document.getElementById('wishlist-btn-' + productId);
+    const icon = document.getElementById('wishlist-icon-' + productId);
+    
+    // Check current state
+    const isInWishlist = icon.classList.contains('fas');
+    
+    // Show loading state
+    button.disabled = true;
+    
+    const url = isInWishlist ? '{{ route("wishlist.remove") }}' : '{{ route("wishlist.add") }}';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            product_id: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (isInWishlist) {
+                // Remove from wishlist
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-danger');
+            } else {
+                // Add to wishlist
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                button.classList.remove('btn-outline-danger');
+                button.classList.add('btn-danger');
+            }
+            updateWishlistCount();
+            showSuccessAlert(data.message);
+        } else {
+            showErrorAlert(data.message || 'An error occurred');
+        }
+        button.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorAlert('An error occurred');
+        button.disabled = false;
+    });
+}
+
+// Check wishlist status for all products on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const productIds = Array.from(document.querySelectorAll('[data-product-id]')).map(el => el.dataset.productId);
+    
+    productIds.forEach(productId => {
+        fetch('{{ route("wishlist.check") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                product_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.in_wishlist) {
+                const button = document.getElementById('wishlist-btn-' + productId);
+                const icon = document.getElementById('wishlist-icon-' + productId);
+                
+                if (button && icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    button.classList.remove('btn-outline-danger');
+                    button.classList.add('btn-danger');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error checking wishlist status:', error);
+        });
+    });
+});
+@endauth
+
+function updateCartCount() {
+    fetch('{{ route("cart.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const countElements = document.querySelectorAll('.cart-count');
+            countElements.forEach(element => {
+                element.textContent = data.count;
+                if (data.count === 0) {
+                    element.style.display = 'none';
+                } else {
+                    element.style.display = 'inline';
+                }
+            });
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+function updateWishlistCount() {
+    fetch('{{ route("wishlist.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const countElements = document.querySelectorAll('.wishlist-count');
+            countElements.forEach(element => {
+                element.textContent = data.count;
+                if (data.count === 0) {
+                    element.style.display = 'none';
+                } else {
+                    element.style.display = 'inline';
+                }
+            });
+        })
+        .catch(error => console.error('Error updating wishlist count:', error));
+}
 </script>
 @endpush

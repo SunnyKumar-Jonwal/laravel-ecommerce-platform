@@ -48,13 +48,20 @@
                                         <strong>#{{ $order->order_number }}</strong>
                                     </td>
                                     <td>
+                                        @if($order->user)
                                         <div>
                                             <strong>{{ $order->user->name }}</strong><br>
                                             <small class="text-muted">{{ $order->user->email }}</small>
                                         </div>
+                                        @else
+                                        <div>
+                                            <strong>Guest User</strong><br>
+                                            <small class="text-muted">No email</small>
+                                        </div>
+                                        @endif
                                     </td>
                                     <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
-                                    <td>{{ $order->order_items_count ?? $order->orderItems->count() }}</td>
+                                    <td>{{ $order->items_count }}</td>
                                     <td>₹{{ number_format($order->total_amount, 2) }}</td>
                                     <td>
                                         <span class="badge bg-{{ $order->payment_status == 'paid' ? 'success' : ($order->payment_status == 'pending' ? 'warning' : 'danger') }}">

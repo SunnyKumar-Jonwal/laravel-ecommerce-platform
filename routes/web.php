@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -11,7 +12,9 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\LegalController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +35,17 @@ Route::get('/category/{slug}', [HomeController::class, 'categoryProducts'])->nam
 Route::get('/brand/{slug}', [HomeController::class, 'brandProducts'])->name('brand.products');
 Route::get('/search', [HomeController::class, 'search'])->name('search');
 
+// About Us Page
+Route::get('/about-us', [LegalController::class, 'aboutUs'])->name('about.us');
+
+// Contact Us Routes
+Route::get('/contact-us', [LegalController::class, 'contactUs'])->name('contact.us');
+Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.store');
+
+// Legal Pages
+Route::get('/terms-and-conditions', [LegalController::class, 'termsAndConditions'])->name('legal.terms');
+Route::get('/privacy-policy', [LegalController::class, 'privacyPolicy'])->name('legal.privacy');
+
 // Cart Routes
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
@@ -42,6 +56,17 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/count', [CartController::class, 'count'])->name('count');
 });
 
+// Wishlist Routes (require authentication)
+Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function () {
+    Route::get('/', [WishlistController::class, 'index'])->name('index');
+    Route::post('/add', [WishlistController::class, 'add'])->name('add');
+    Route::post('/remove', [WishlistController::class, 'remove'])->name('remove');
+    Route::post('/clear', [WishlistController::class, 'clear'])->name('clear');
+    Route::get('/count', [WishlistController::class, 'count'])->name('count');
+    Route::post('/check', [WishlistController::class, 'check'])->name('check');
+    Route::post('/move-to-cart', [WishlistController::class, 'moveToCart'])->name('move-to-cart');
+});
+
 // Checkout Routes
 Route::middleware('auth')->group(function () {
     // Profile Routes
@@ -49,9 +74,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\ProfileController::class, 'index'])->name('index');
         Route::put('/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('update');
         Route::put('/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('password');
+        Route::get('/addresses', [App\Http\Controllers\ProfileController::class, 'addresses'])->name('addresses');
         Route::post('/address', [App\Http\Controllers\ProfileController::class, 'storeAddress'])->name('address.store');
         Route::put('/address/{address}', [App\Http\Controllers\ProfileController::class, 'updateAddress'])->name('address.update');
         Route::delete('/address/{address}', [App\Http\Controllers\ProfileController::class, 'deleteAddress'])->name('address.delete');
+        Route::get('/orders', [App\Http\Controllers\ProfileController::class, 'orders'])->name('orders');
     });
 
     // User Orders Routes
@@ -62,17 +89,19 @@ Route::middleware('auth')->group(function () {
         Route::post('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel');
     });
 
+    // Checkout Routes
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
     Route::get('/order/success/{order}', [CheckoutController::class, 'success'])->name('order.success');
     
+    // TODO: Create PaymentController
     // Payment Routes
-    Route::prefix('payment')->name('payment.')->group(function () {
-        Route::get('/razorpay/{order}', [PaymentController::class, 'razorpay'])->name('razorpay');
-        Route::post('/razorpay/callback', [PaymentController::class, 'razorpayCallback'])->name('razorpay.callback');
-        Route::get('/failed/{order}', [PaymentController::class, 'failed'])->name('failed');
-        Route::get('/retry/{order}', [PaymentController::class, 'retry'])->name('retry');
-    });
+    // Route::prefix('payment')->name('payment.')->group(function () {
+    //     Route::get('/razorpay/{order}', [PaymentController::class, 'razorpay'])->name('razorpay');
+    //     Route::post('/razorpay/callback', [PaymentController::class, 'razorpayCallback'])->name('razorpay.callback');
+    //     Route::get('/failed/{order}', [PaymentController::class, 'failed'])->name('failed');
+    //     Route::get('/retry/{order}', [PaymentController::class, 'retry'])->name('retry');
+    // });
 });
 
 // Authentication Routes
@@ -105,8 +134,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::get('/users/{user}/addresses', [UserController::class, 'addresses'])->name('users.addresses');
     Route::get('/users/{user}/orders', [UserController::class, 'orders'])->name('users.orders');
+    
+    // Contact Form Management
+    Route::resource('contacts', AdminContactController::class)->except(['create', 'store', 'edit', 'update']);
+    Route::patch('/contacts/{contact}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
+    Route::post('/contacts/{contact}/reply', [AdminContactController::class, 'reply'])->name('contacts.reply');
+    Route::post('/contacts/bulk-action', [AdminContactController::class, 'bulkAction'])->name('contacts.bulk-action');
 });
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');

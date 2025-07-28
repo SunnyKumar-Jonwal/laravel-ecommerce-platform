@@ -208,7 +208,7 @@ class ProductController extends Controller
             
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_path' => $imageUrl,
+                'image' => $imageUrl,
                 'alt_text' => $product->name,
                 'sort_order' => $index
             ]);

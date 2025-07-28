@@ -1,13 +1,136 @@
-# Laravel E-Commerce Platform
+# Kashish World - E-Commerce Platform
 
-A full-featured e-commerce application built with Laravel, featuring a modern frontend shop, comprehensive admin panel, and secure payment integration.
+A modern e-commerce platform built with Laravel featuring admin panel, product management, wishlist, cart, and order management.
 
 ## Features
 
-### Frontend Features
-- **Homepage**: Hero section, featured categories, products showcase
-- **Product Catalog**: Browse products with filters and search
-- **Shopping Cart**: Add/remove items, quantity management
+- 🛍️ Modern e-commerce storefront
+- 👑 Admin panel with comprehensive management tools
+- 📱 Responsive design
+- 🛒 Shopping cart and wishlist
+- 📦 Order management
+- 💳 Checkout process
+- 📧 Contact form system
+- 📄 Legal pages (Terms & Conditions, Privacy Policy)
+- 👤 User authentication and profiles
+
+## Tech Stack
+
+- **Backend**: Laravel 10.x
+- **Frontend**: Bootstrap 5, JavaScript
+- **Database**: MySQL
+- **Deployment**: Railway
+- **Local Development**: PHP 8.1+, Composer, Node.js
+
+## Local Development
+
+### Prerequisites
+
+- PHP 8.1 or higher
+- Composer
+- MySQL 5.7+ or 8.0+
+- Node.js 16+ and npm
+- Git
+
+### Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd e-commerce
+   ```
+
+2. **Install PHP dependencies:**
+   ```bash
+   composer install
+   ```
+
+3. **Install Node.js dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Environment configuration:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+5. **Configure database in .env:**
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=ecommerce_laravel
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
+
+6. **Run migrations and seeders:**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+7. **Create storage link:**
+   ```bash
+   php artisan storage:link
+   ```
+
+8. **Compile assets:**
+   ```bash
+   npm run dev
+   ```
+
+9. **Start the server:**
+   ```bash
+   php artisan serve
+   ```
+
+10. **Access the application:**
+    - Frontend: http://localhost:8000
+    - Admin Panel: http://localhost:8000/admin
+
+## Deployment to Railway
+
+### Quick Railway Deployment
+
+1. **Push to GitHub:**
+   ```bash
+   git add .
+   git commit -m "Ready for Railway deployment"
+   git push origin main
+   ```
+
+2. **Deploy on Railway:**
+   - Visit [railway.app](https://railway.app)
+   - Sign in with GitHub
+   - Click "New Project" → "Deploy from GitHub repo"
+   - Select your repository
+
+3. **Add MySQL Database:**
+   - Click "Add Service" → "Database" → "MySQL"
+   - Railway auto-configures database connection
+
+4. **Configure Environment Variables:**
+   - Go to your service settings
+   - Add variables tab
+   - Set `APP_KEY` (generate with: `php artisan key:generate --show`)
+
+5. **Deploy!**
+   - Railway automatically builds and deploys
+   - Your app will be live at the provided Railway URL
+
+### Detailed Guide
+
+See `RAILWAY_DEPLOYMENT.md` for complete deployment instructions.
+
+## Admin Panel
+
+Access the admin panel at `/admin` with admin credentials.
+
+### Default Admin User
+- Email: admin@example.com
+- Password: password
 - **User Authentication**: Registration, login, profile management
 - **Checkout Process**: Multi-step checkout with address management
 - **Payment Integration**: Razorpay payment gateway
@@ -199,4 +322,74 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 ## Support
 
-For support, email support@yourstore.com or create an issue in the repository.
+For support, email support@kashishworld.com or create an issue in the repository.
+
+### Common Issues and Solutions
+
+#### Local Development Issues
+
+**Issue: "No application encryption key has been specified"**
+- **Solution**: Run `php artisan key:generate`
+
+**Issue: "Storage link missing"**
+- **Solution**: Run `php artisan storage:link`
+
+**Issue: "Database connection failed"**
+- **Solution**: Check your database credentials in `.env` file
+- Ensure MySQL service is running
+
+**Issue: "Permission denied" errors**
+- **Solution**: Fix storage permissions:
+  ```bash
+  chmod -R 775 storage bootstrap/cache
+  ```
+
+**Issue: "npm build fails"**
+- **Solution**: Clear npm cache and reinstall:
+  ```bash
+  npm cache clean --force
+  npm install
+  npm run dev
+  ```
+
+#### Railway Deployment Issues
+
+**Issue: "Build fails on Railway"**
+- **Solution**: Check build logs in Railway dashboard
+- Ensure `composer.json` and `package.json` are valid
+- Verify all required environment variables are set
+
+**Issue: "Database connection fails on Railway"**
+- **Solution**: Verify Railway MySQL service is running
+- Check environment variables match Railway database credentials
+
+**Issue: "500 Internal Server Error"**
+- **Solution**: Set `APP_DEBUG=true` temporarily to see detailed errors
+- Check Railway application logs
+- Ensure `APP_KEY` is set
+
+#### Development Tips
+
+1. **Test locally first:**
+   ```bash
+   php artisan serve
+   ```
+
+2. **Clear Laravel caches:**
+   ```bash
+   php artisan cache:clear
+   php artisan config:clear
+   php artisan route:clear
+   php artisan view:clear
+   ```
+
+3. **Run migrations:**
+   ```bash
+   php artisan migrate
+   php artisan migrate --seed
+   ```
+
+4. **Check application status:**
+   ```bash
+   php artisan about
+   ```

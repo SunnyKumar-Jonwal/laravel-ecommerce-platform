@@ -121,7 +121,7 @@
                             <div class="row">
                                 @foreach($product->images as $image)
                                 <div class="col-md-3 mb-3">
-                                    <img src="{{ $image->image_path ?: 'https://via.placeholder.com/200x200?text=No+Image' }}" 
+                                    <img src="{{ $image->image_url ?: 'https://via.placeholder.com/200x200?text=No+Image' }}" 
                                          alt="Product Image" 
                                          class="img-fluid rounded shadow-sm"
                                          style="width: 100%; height: 200px; object-fit: cover;">
