@@ -1,38 +1,31 @@
 #!/bin/bash
 
-# Railway build script for Kashish World Laravel App
-echo "🚀 Building Kashish World for Railway deployment..."
+# Railway build script for Laravel
+echo "🚀 Building Kashish World for Railway..."
 
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."
-composer install --no-dev --optimize-autoloader
+composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node dependencies
+# Install Node dependencies and build assets
 echo "📦 Installing Node.js dependencies..."
-npm ci --only=production
+npm ci
 
-# Build assets
+# Build frontend assets
 echo "🎨 Building frontend assets..."
 npm run build
 
-# Set permissions for storage and cache
-echo "🔐 Setting proper permissions..."
-chmod -R 775 storage bootstrap/cache
-
 # Generate application key if not set
-if [ -z "$APP_KEY" ]; then
-    echo "🔑 Generating application key..."
-    php artisan key:generate --force
-fi
+echo "🔑 Setting up application..."
+php artisan key:generate --force --no-interaction || true
 
 # Cache configuration for better performance
-echo "⚡ Caching configuration..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+echo "⚡ Optimizing application..."
+php artisan config:cache --no-interaction || true
+php artisan route:cache --no-interaction || true
+php artisan view:cache --no-interaction || true
 
-echo "✅ Build completed successfully for Railway!"
-echo "🌐 Your app is ready for deployment!"
+echo "✅ Build completed successfully!"
     echo "❌ Docker build failed!"
     exit 1
 fi

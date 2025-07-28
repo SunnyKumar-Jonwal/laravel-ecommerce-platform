@@ -15,36 +15,48 @@
 2. **Create New Project**
    - Click "New Project"
    - Select "Deploy from GitHub repo"
-   - Choose your repository
+   - Choose your repository: `laravel-ecommerce-platform`
+   - Select branch: `feature/remaining-components`
 
 3. **Add Database**
-   - Click "Add Service"
+   - Click "Add Service" 
    - Select "Database" → "MySQL"
-   - Railway will automatically create database
+   - Railway will automatically create database and set environment variables
 
 ### 3. Configure Environment Variables
 
-Add these environment variables in Railway dashboard:
+Railway auto-configures database variables, but you need to add:
 
+**Required Variables:**
 ```env
 APP_NAME=Kashish World
 APP_ENV=production
 APP_DEBUG=false
-APP_KEY=[Generate using: php artisan key:generate --show]
+APP_KEY=[Click "Generate" or use: php artisan key:generate --show]
+APP_URL=[Will be auto-set by Railway]
 ```
 
-Database variables (auto-configured by Railway):
+**Database variables (auto-configured by Railway):**
 - `MYSQLHOST`
 - `MYSQLPORT` 
 - `MYSQLDATABASE`
 - `MYSQLUSER`
 - `MYSQLPASSWORD`
 
-### 4. Deploy!
+### 4. Fix Build Issues
+
+If build fails with Nixpacks error:
+1. Ensure `nixpacks.toml` is deleted (Railway auto-detects Laravel)
+2. Make sure `package.json` has valid JSON syntax
+3. Check that `composer.json` is valid
+
+### 5. Deploy!
 
 Railway will automatically:
-- Build your application
-- Run migrations
+- Detect Laravel project
+- Install PHP dependencies 
+- Install Node dependencies and build assets
+- Run migrations (add manually if needed)
 - Deploy to a public URL
 
 ## Custom Domain (Optional)
