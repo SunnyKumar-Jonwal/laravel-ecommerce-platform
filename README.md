@@ -321,7 +321,7 @@ Documentation available at `/api/documentation` (if API docs are implemented)
 This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Support
-
+feature/remaining-components
 For support, email support@kashishworld.com or create an issue in the repository.
 
 ### Common Issues and Solutions
@@ -393,3 +393,6 @@ For support, email support@kashishworld.com or create an issue in the repository
    ```bash
    php artisan about
    ```
+=======
+For support, email sunnyjonwal76@gmail.com or create an issue in the repository.
+main
