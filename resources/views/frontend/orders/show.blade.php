@@ -37,7 +37,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($order->orderItems as $item)
+                                        @foreach($order->items as $item)
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
@@ -175,26 +175,69 @@
                     </div>
                     
                     <!-- Payment Information -->
-                    @if($order->payment)
+                    @if($order->payments && $order->payments->count() > 0)
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Payment Information</h5>
                             </div>
                             <div class="card-body">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Method:</span>
-                                    <span class="text-capitalize">{{ $order->payment->payment_method }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Status:</span>
-                                    <span class="badge bg-{{ $order->payment->status === 'completed' ? 'success' : 'warning' }}">
-                                        {{ ucfirst($order->payment->status) }}
-                                    </span>
-                                </div>
-                                @if($order->payment->transaction_id)
+                                @foreach($order->payments as $payment)
+                                    <div class="payment-item {{ !$loop->last ? 'border-bottom pb-3 mb-3' : '' }}">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Method:</span>
+                                            <span class="text-capitalize">{{ $payment->payment_method }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Amount:</span>
+                                            <span>₹{{ number_format($payment->amount, 2) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Status:</span>
+                                            <span class="badge bg-{{ $payment->status === 'completed' ? 'success' : ($payment->status === 'pending' ? 'warning' : 'danger') }}">
+                                                {{ ucfirst($payment->status) }}
+                                            </span>
+                                        </div>
+                                        @if($payment->transaction_id)
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Transaction ID:</span>
+                                                <small class="text-muted">{{ $payment->transaction_id }}</small>
+                                            </div>
+                                        @endif
+                                        @if($payment->processed_at)
+                                            <div class="d-flex justify-content-between">
+                                                <span>Processed:</span>
+                                                <small class="text-muted">{{ $payment->processed_at->format('M d, Y H:i') }}</small>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @elseif($order->payment_method || $order->payment_status)
+                        <!-- Fallback Payment Information from Order -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Payment Information</h5>
+                            </div>
+                            <div class="card-body">
+                                @if($order->payment_method)
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>Transaction ID:</span>
-                                        <small class="text-muted">{{ $order->payment->transaction_id }}</small>
+                                        <span>Method:</span>
+                                        <span class="text-capitalize">{{ $order->payment_method }}</span>
+                                    </div>
+                                @endif
+                                @if($order->payment_status)
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Status:</span>
+                                        <span class="badge bg-{{ $order->payment_status === 'completed' ? 'success' : ($order->payment_status === 'pending' ? 'warning' : 'danger') }}">
+                                            {{ ucfirst($order->payment_status) }}
+                                        </span>
+                                    </div>
+                                @endif
+                                @if($order->payment_id)
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Payment ID:</span>
+                                        <small class="text-muted">{{ $order->payment_id }}</small>
                                     </div>
                                 @endif
                             </div>

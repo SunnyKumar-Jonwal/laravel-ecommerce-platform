@@ -37,7 +37,7 @@
                         </div>
                         @foreach($product->images->take(3) as $image)
                         <div class="col-3">
-                            <img src="{{ $image->image_path ?: 'https://via.placeholder.com/150x150?text=No+Image' }}" 
+                            <img src="{{ $image->image_url ?: 'https://via.placeholder.com/150x150?text=No+Image' }}" 
                                  alt="{{ $product->name }}" 
                                  class="img-fluid rounded thumb-image"
                                  onclick="changeMainImage(this.src)">
@@ -106,10 +106,19 @@
                                     {{ $product->stock_quantity <= 0 ? 'disabled' : '' }}>
                                 <i class="fas fa-cart-plus"></i> Add to Cart
                             </button>
-                            <button type="button" class="btn btn-outline-danger btn-lg" 
-                                    onclick="addToWishlist({{ $product->id }})">
-                                <i class="far fa-heart"></i> Wishlist
+                            @auth
+                            <button type="button" class="btn btn-outline-danger btn-lg wishlist-btn" 
+                                    id="wishlist-btn-{{ $product->id }}"
+                                    data-product-id="{{ $product->id }}"
+                                    onclick="toggleWishlist({{ $product->id }})">
+                                <i class="far fa-heart" id="wishlist-icon-{{ $product->id }}"></i> 
+                                <span id="wishlist-text-{{ $product->id }}">Wishlist</span>
                             </button>
+                            @else
+                            <a href="{{ route('login') }}" class="btn btn-outline-danger btn-lg">
+                                <i class="far fa-heart"></i> Login to Save
+                            </a>
+                            @endauth
                         </div>
                     </div>
                 </form>
@@ -238,21 +247,151 @@ function addToCart(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Product added to cart successfully!');
+            showSuccessAlert('Product added to cart successfully!');
             // Update cart count if you have one
+            updateCartCount();
         } else {
-            alert('Error adding product to cart');
+            showErrorAlert(data.message || 'Failed to add product to cart');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding product to cart');
+        showErrorAlert('Error adding product to cart');
     });
 }
 
+@auth
+function toggleWishlist(productId) {
+    const button = document.getElementById('wishlist-btn-' + productId);
+    const icon = document.getElementById('wishlist-icon-' + productId);
+    const text = document.getElementById('wishlist-text-' + productId);
+    
+    // Check current state
+    const isInWishlist = icon.classList.contains('fas');
+    
+    // Show loading state
+    const originalText = text.textContent;
+    text.textContent = 'Loading...';
+    button.disabled = true;
+    
+    const url = isInWishlist ? '{{ route("wishlist.remove") }}' : '{{ route("wishlist.add") }}';
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            product_id: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (isInWishlist) {
+                // Remove from wishlist
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                text.textContent = 'Wishlist';
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-danger');
+                showSuccessAlert('Product removed from wishlist!');
+            } else {
+                // Add to wishlist
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                text.textContent = 'In Wishlist';
+                button.classList.remove('btn-outline-danger');
+                button.classList.add('btn-danger');
+                showSuccessAlert('Product added to wishlist!');
+            }
+            updateWishlistCount();
+        } else {
+            showErrorAlert(data.message || 'An error occurred');
+            text.textContent = originalText;
+        }
+        button.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorAlert('An error occurred');
+        text.textContent = originalText;
+        button.disabled = false;
+    });
+}
+
+// Check if product is in wishlist on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const productId = {{ $product->id }};
+    
+    fetch('{{ route("wishlist.check") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            product_id: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const button = document.getElementById('wishlist-btn-' + productId);
+        const icon = document.getElementById('wishlist-icon-' + productId);
+        const text = document.getElementById('wishlist-text-' + productId);
+        
+        if (data.in_wishlist) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            text.textContent = 'In Wishlist';
+            button.classList.remove('btn-outline-danger');
+            button.classList.add('btn-danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error checking wishlist status:', error);
+    });
+});
+@endauth
+
+function updateCartCount() {
+    fetch('{{ route("cart.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const countElements = document.querySelectorAll('.cart-count');
+            countElements.forEach(element => {
+                element.textContent = data.count;
+                if (data.count === 0) {
+                    element.style.display = 'none';
+                } else {
+                    element.style.display = 'inline';
+                }
+            });
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+function updateWishlistCount() {
+    fetch('{{ route("wishlist.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const countElements = document.querySelectorAll('.wishlist-count');
+            countElements.forEach(element => {
+                element.textContent = data.count;
+                if (data.count === 0) {
+                    element.style.display = 'none';
+                } else {
+                    element.style.display = 'inline';
+                }
+            });
+        })
+        .catch(error => console.error('Error updating wishlist count:', error));
+}
+
 function addToWishlist(productId) {
-    // Implement wishlist functionality
-    alert('Wishlist functionality coming soon!');
+    // Legacy function - redirect to toggle
+    toggleWishlist(productId);
 }
 </script>
 @endpush

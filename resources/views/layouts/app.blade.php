@@ -147,7 +147,22 @@
                         <a class="nav-link" href="{{ route('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about.us') }}">About Us</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('shop') }}">Shop</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Legal
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('legal.terms') }}">Terms & Conditions</a></li>
+                            <li><a class="dropdown-item" href="{{ route('legal.privacy') }}">Privacy Policy</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('contact.us') }}">Contact Us</a>
                     </li>
                 </ul>
 
@@ -160,11 +175,21 @@
                 </form>
 
                 <ul class="navbar-nav">
+                    <!-- Wishlist -->
+                    @auth
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{{ route('wishlist.index') }}">
+                            <i class="far fa-heart"></i>
+                            <span class="cart-badge wishlist-count" id="wishlist-count" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    @endauth
+
                     <!-- Cart -->
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge" id="cart-count">0</span>
+                            <span class="cart-badge cart-count" id="cart-count">0</span>
                         </a>
                     </li>
 
@@ -182,6 +207,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{{ route('orders.index') }}">My Orders</a></li>
+                                <li><a class="dropdown-item" href="{{ route('wishlist.index') }}">My Wishlist</a></li>
                                 <li><a class="dropdown-item" href="{{ route('profile.index') }}">Profile</a></li>
                                 @if(Auth::user()->hasRole('admin'))
                                     <li><hr class="dropdown-divider"></li>
@@ -242,21 +268,19 @@
                     <h6>Quick Links</h6>
                     <ul class="list-unstyled">
                         <li><a href="{{ route('home') }}" class="text-light">Home</a></li>
+                        <li><a href="{{ route('about.us') }}" class="text-light">About Us</a></li>
                         <li><a href="{{ route('shop') }}" class="text-light">Shop</a></li>
-                        <li><a href="#" class="text-light">About Us</a></li>
-                        <li><a href="#" class="text-light">Contact</a></li>
+                        <li><a href="{{ route('contact.us') }}" class="text-light">Contact Us</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h6>Customer Service</h6>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6>Legal</h6>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-light">Help Center</a></li>
-                        <li><a href="#" class="text-light">Returns</a></li>
-                        <li><a href="#" class="text-light">Shipping Info</a></li>
-                        <li><a href="#" class="text-light">Track Your Order</a></li>
+                        <li><a href="{{ route('legal.terms') }}" class="text-light">Terms & Conditions</a></li>
+                        <li><a href="{{ route('legal.privacy') }}" class="text-light">Privacy Policy</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
+                <div class="col-lg-2 col-md-6 mb-4">
                     <h6>Contact Info</h6>
                     <ul class="list-unstyled">
                         <li><i class="fas fa-phone"></i> +91 12345 67890</li>
@@ -271,7 +295,7 @@
                     <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="mb-0">Made with <i class="fas fa-heart text-danger"></i> using Laravel</p>
+                    <p class="mb-0">Welcome <i class="fas fa-heart text-danger"></i> Kashish World</p>
                 </div>
             </div>
         </div>
@@ -435,6 +459,43 @@
                 cancelButtonText: 'Cancel'
             });
         }
+
+        // Initialize counts on page load
+        @auth
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update cart count
+            fetch('{{ route("cart.count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const countElements = document.querySelectorAll('.cart-count');
+                    countElements.forEach(element => {
+                        element.textContent = data.count;
+                        if (data.count === 0) {
+                            element.style.display = 'none';
+                        } else {
+                            element.style.display = 'inline';
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading cart count:', error));
+
+            // Update wishlist count
+            fetch('{{ route("wishlist.count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const countElements = document.querySelectorAll('.wishlist-count');
+                    countElements.forEach(element => {
+                        element.textContent = data.count;
+                        if (data.count === 0) {
+                            element.style.display = 'none';
+                        } else {
+                            element.style.display = 'inline';
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading wishlist count:', error));
+        });
+        @endauth
     </script>
 
     @stack('scripts')

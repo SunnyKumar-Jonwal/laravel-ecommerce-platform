@@ -149,7 +149,7 @@
                                                 </a>
                                             </td>
                                             <td>{{ $order->created_at->format('M d, Y') }}</td>
-                                            <td>{{ $order->orderItems->count() }}</td>
+                                            <td>{{ $order->items->count() }}</td>
                                             <td>₹{{ number_format($order->total_amount, 2) }}</td>
                                             <td>
                                                 <span class="badge bg-{{ $order->status == 'delivered' ? 'success' : ($order->status == 'cancelled' ? 'danger' : 'warning') }}">

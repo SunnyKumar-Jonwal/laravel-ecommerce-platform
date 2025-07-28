@@ -50,14 +50,14 @@
                                             <br><small class="text-muted">{{ $order->created_at->format('h:i A') }}</small>
                                         </td>
                                         <td>
-                                            {{ $order->orderItems->count() }} items
+                                            {{ $order->items->count() }} items
                                             <br>
                                             <small class="text-muted">
-                                                @foreach($order->orderItems->take(2) as $item)
+                                                @foreach($order->items->take(2) as $item)
                                                     {{ $item->product->name }}@if(!$loop->last), @endif
                                                 @endforeach
-                                                @if($order->orderItems->count() > 2)
-                                                    +{{ $order->orderItems->count() - 2 }} more
+                                                @if($order->items->count() > 2)
+                                                    +{{ $order->items->count() - 2 }} more
                                                 @endif
                                             </small>
                                         </td>

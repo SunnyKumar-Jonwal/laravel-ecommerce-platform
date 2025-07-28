@@ -26,11 +26,10 @@ class HomeController extends Controller
             ->get();
             
         // Top categories
-        $topCategories = Category::active()
+        $topCategories = Category::where('status', true)
             ->whereNull('parent_id')
             ->withCount('products')
-            ->orderBy('products_count', 'desc')
-            ->take(6)
+            ->orderBy('name', 'asc')
             ->get();
             
         // Best selling products

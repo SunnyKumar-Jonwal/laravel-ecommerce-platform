@@ -28,6 +28,28 @@ class ProfileController extends Controller
     }
 
     /**
+     * Show user addresses page
+     */
+    public function addresses()
+    {
+        $user = Auth::user();
+        $addresses = $user->addresses()->get();
+        
+        return view('frontend.profile.addresses', compact('user', 'addresses'));
+    }
+
+    /**
+     * Show user orders page
+     */
+    public function orders()
+    {
+        $user = Auth::user();
+        $orders = $user->orders()->with(['items.product'])->latest()->paginate(10);
+        
+        return view('frontend.profile.orders', compact('user', 'orders'));
+    }
+
+    /**
      * Update user profile information
      */
     public function update(Request $request)
@@ -78,7 +100,7 @@ class ProfileController extends Controller
     public function storeAddress(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:home,office,other',
+            'type' => 'required|in:Home,Office,Other,home,office,other',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -88,14 +110,22 @@ class ProfileController extends Controller
             'state' => 'required|string|max:255',
             'postal_code' => 'required|string|max:10',
             'country' => 'required|string|max:255',
+            'is_default' => 'nullable|boolean',
         ]);
 
+        // Normalize the type to lowercase
+        $data = $request->all();
+        $data['type'] = strtolower($data['type']);
+        
+        // Handle is_default checkbox (convert to boolean)
+        $data['is_default'] = $request->has('is_default') ? true : false;
+
         // Set all addresses as non-default first if this is being set as default
-        if ($request->is_default) {
+        if ($data['is_default']) {
             Auth::user()->addresses()->update(['is_default' => false]);
         }
 
-        Auth::user()->addresses()->create($request->all());
+        Auth::user()->addresses()->create($data);
 
         return redirect()->route('profile.index')->with('success', 'Address added successfully!');
     }

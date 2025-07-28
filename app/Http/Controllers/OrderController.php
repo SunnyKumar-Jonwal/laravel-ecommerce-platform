@@ -19,7 +19,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Auth::user()->orders()
-            ->with(['orderItems.product', 'payment'])
+            ->with(['items.product', 'payments'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -36,7 +36,7 @@ class OrderController extends Controller
             abort(403);
         }
 
-        $order->load(['orderItems.product', 'payment', 'user']);
+        $order->load(['items.product', 'payments', 'user']);
 
         return view('frontend.orders.show', compact('order'));
     }
@@ -56,7 +56,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Invoice can only be downloaded for completed orders.');
         }
 
-        $order->load(['orderItems.product', 'payment', 'user']);
+        $order->load(['items.product', 'payments', 'user']);
 
         return view('frontend.orders.invoice', compact('order'));
     }

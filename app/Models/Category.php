@@ -47,7 +47,7 @@ class Category extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('status', true);
     }
 
     public function scopeParent($query)

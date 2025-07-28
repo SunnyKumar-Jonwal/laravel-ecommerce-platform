@@ -163,6 +163,19 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}" href="{{ route('admin.contacts.index') }}">
+                    <i class="fas fa-fw fa-envelope me-2"></i>
+                    Contact Forms
+                    @php
+                        $newContactsCount = \App\Models\Contact::where('status', 'new')->count();
+                    @endphp
+                    @if($newContactsCount > 0)
+                        <span class="badge bg-danger ms-2">{{ $newContactsCount }}</span>
+                    @endif
+                </a>
+            </li>
+
             <div class="sidebar-divider"></div>
 
             <li class="nav-item">
