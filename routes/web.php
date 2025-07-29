@@ -6,12 +6,14 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\ContactController;
@@ -83,10 +85,10 @@ Route::middleware('auth')->group(function () {
 
     // User Orders Routes
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [App\Http\Controllers\OrderController::class, 'index'])->name('index');
-        Route::get('/{order}', [App\Http\Controllers\OrderController::class, 'show'])->name('show');
-        Route::get('/{order}/invoice', [App\Http\Controllers\OrderController::class, 'downloadInvoice'])->name('invoice');
-        Route::post('/{order}/cancel', [App\Http\Controllers\OrderController::class, 'cancel'])->name('cancel');
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+        Route::get('/{order}/invoice', [OrderController::class, 'downloadInvoice'])->name('invoice');
+        Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
     });
 
     // Checkout Routes
@@ -122,12 +124,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/products/image/delete', [ProductController::class, 'deleteImage'])->name('products.image.delete');
     
     // Orders
-    Route::resource('orders', OrderController::class)->except(['create', 'store', 'edit']);
-    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
-    Route::patch('/orders/{order}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('orders.payment-status');
-    Route::post('/orders/{order}/note', [OrderController::class, 'addNote'])->name('orders.note');
-    Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
-    Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    Route::resource('orders', AdminOrderController::class)->except(['create', 'store', 'edit']);
+    Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
+    Route::patch('/orders/{order}/payment-status', [AdminOrderController::class, 'updatePaymentStatus'])->name('orders.payment-status');
+    Route::post('/orders/{order}/note', [AdminOrderController::class, 'addNote'])->name('orders.note');
+    Route::get('/orders/{order}/print', [AdminOrderController::class, 'print'])->name('orders.print');
+    Route::get('/orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
     
     // Users Management
     Route::resource('users', UserController::class);
