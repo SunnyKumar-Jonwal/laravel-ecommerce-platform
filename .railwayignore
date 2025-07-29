@@ -1,0 +1,21 @@
+# Railway ignore file
+node_modules/
+.git/
+.env.local
+.env.development
+.env.testing
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+.phpunit.result.cache
+tests/
+*.bat
+docker*
+Docker*
+README.md
+CLEANUP_SUMMARY.md
+.editorconfig
+.gitattributes
+.gitignore
+phpunit.xml
